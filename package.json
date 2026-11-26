@@ -7,7 +7,9 @@
     "dev": "vp dev",
     "build": "tsc -b && vp build",
     "lint": "vp lint",
-    "preview": "vp preview"
+    "preview": "vp preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -15,11 +17,13 @@
     "react-router": "^8.5.3"
   },
   "devDependencies": {
+    "@storybook/react-vite": "11.0.0-rc.1",
     "@types/node": "^26.6.10",
     "@types/react": "^19.3.3",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
     "happy-dom": "^21.0.4",
+    "storybook": "11.0.0-rc.1",
     "typescript": "~7.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:"
