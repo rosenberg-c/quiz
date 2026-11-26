@@ -1,0 +1,24 @@
+sequenceDiagram
+    actor Player as Player (user)
+    participant Home as Home (screen)
+    participant Settings as Settings (screen)
+    participant Storage as localStorage (storage)
+    participant Quiz as Quiz (screen)
+    participant API as OpenTDB (API)
+
+    Note over Home: Categories: General Knowledge (9), Music (12), Geography (22), Film (11), Sports (21), Computers (18)
+    opt Change timer in Settings
+        Settings->>Storage: Read saved duration
+        Note over Settings: Missing or invalid defaults to 15 seconds
+        Player->>Settings: Choose duration (3, 5, 7, 10, 15, or 20 seconds)
+        Settings->>Storage: Save duration
+    end
+    Player->>Home: Choose category
+    Home->>Quiz: Start new in-memory session for category
+    Quiz->>API: Request 10 questions for category
+    alt Network, API, or invalid response
+        Quiz-->>Player: Show fetch error and offer return home
+    else Valid response
+        Note over Quiz: Validate and decode question and answer text
+        Quiz-->>Player: Show first question
+    end

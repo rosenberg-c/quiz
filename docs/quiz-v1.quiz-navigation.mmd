@@ -1,0 +1,25 @@
+sequenceDiagram
+    actor Player as Player (user)
+    participant Quiz as Quiz (screen)
+    participant Session as Quiz session (context)
+    participant Results as Results (screen)
+    participant Home as Home (screen)
+    participant API as OpenTDB (API)
+
+    alt Back during quiz
+        Player->>Quiz: Back
+        Quiz->>Session: Cancel and clear session
+        Quiz->>Home: Return home
+    else After question 10
+        Quiz->>Results: Show score out of 10
+        alt Play again
+            Player->>Results: Play again
+            Results->>Session: Start fresh session in same category
+            Session->>API: Fetch 10 new questions
+            Note over Session: Show first question or fetch error
+        else Home
+            Player->>Results: Home
+            Results->>Session: Clear session
+            Results->>Home: Return home
+        end
+    end
