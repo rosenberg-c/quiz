@@ -1,0 +1,20 @@
+sequenceDiagram
+    actor Player as Player (user)
+    participant Quiz as Quiz (screen)
+    participant Storage as localStorage (storage)
+    participant Session as Quiz session (context)
+
+    loop Each of 10 questions
+        Quiz->>Storage: Read saved duration
+        Note over Quiz: Use allowed value (3, 5, 7, 10, 15, 20) or default 15 and start countdown
+        alt Answer before expiry
+            Player->>Quiz: Select answer
+            Quiz->>Session: Resolve with answer
+        else Timer expires
+            Quiz->>Session: Resolve as timeout
+        end
+        Note over Quiz,Session: Resolve once and ignore late events, stop timer, freeze choices
+        Session-->>Quiz: Reveal correct answer and score only correct choices
+        Player->>Quiz: Next
+        Quiz->>Session: Advance, or finish after question 10
+    end
