@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router";
+import { ThemeSelector } from "../../../theme/ThemeSelector";
 import { navigation } from "../../content/navigation";
 import { siteHeaderContent } from "./SiteHeader.content";
 import { paths } from "../../../../routes";
@@ -21,6 +22,7 @@ export const SiteHeader = () => {
           </NavLink>
         ))}
       </nav>
+      <ThemeSelector />
     </header>
   );
 };

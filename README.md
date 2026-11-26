@@ -17,6 +17,7 @@ vp dev
 
 ```sh
 vp check       # format, lint, and type-check
+vp test        # run Vitest unit tests
 vp run build   # type-check and build for production
 vp preview     # preview the build locally
 ```

@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Quiz" />
-    <meta name="theme-color" content="#F7EFE3" />
+    <meta name="theme-color" content="#0b1a2a" />
     <title>Quiz</title>
     <script>
       (function () {
@@ -19,9 +19,11 @@
         } catch (e) {}
         var systemDark = false;
         try {
-          systemDark = window.matchMedia(
-            "(prefers-color-scheme: dark)",
-          ).matches;
+          if (window.matchMedia) {
+            systemDark = window.matchMedia(
+              "(prefers-color-scheme: dark)",
+            ).matches;
+          }
         } catch (e) {}
         var resolved =
           preference === "system"
@@ -35,7 +37,7 @@
         if (meta) {
           meta.setAttribute(
             "content",
-            resolved === "dark" ? "#1b140f" : "#f7efe3",
+            resolved === "dark" ? "#0b1a2a" : "#e8eef3",
           );
         }
       })();
