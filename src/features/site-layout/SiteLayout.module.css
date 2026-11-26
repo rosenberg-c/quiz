@@ -1,0 +1,4 @@
+.main {
+  width: min(100% - 2 * var(--space-6), var(--content-max));
+  margin-inline: auto;
+}
