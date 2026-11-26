@@ -1,0 +1,13 @@
+flowchart LR
+    home["Home (/)"]
+    settings["Settings (/settings)"]
+    quiz["Quiz (/quiz)"]
+    results["Results (Quiz view)"]
+
+    home -->|Settings| settings
+    settings -->|Home| home
+    home -->|Category| quiz
+    quiz -->|Back / cancel| home
+    quiz -->|Complete| results
+    results -->|Home| home
+    results -->|Replay| quiz
