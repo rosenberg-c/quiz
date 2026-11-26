@@ -2,9 +2,9 @@ import type { Category } from "./components/CategoryCard/CategoryCard";
 
 export const homeContent = {
   title: "Find your next challenge",
-  description: "Explore six quiz categories. Playing is coming soon.",
+  description: "Explore six quiz categories. Choose one to load a round.",
   categoriesHeading: "Categories",
-  availability: "Coming soon",
+  startLabel: "Start quiz",
   categories: [
     { id: 9, name: "General Knowledge" },
     { id: 12, name: "Music" },

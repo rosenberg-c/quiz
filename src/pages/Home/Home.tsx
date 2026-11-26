@@ -1,8 +1,14 @@
+import { useNavigate } from "react-router";
+import { useQuizSession } from "../../features/quiz-session/useQuizSession";
+import { paths } from "../../routes";
 import { CategoryCard } from "./components/CategoryCard/CategoryCard";
 import { homeContent } from "./Home.content";
 import styles from "./Home.module.css";
 
 export const Home = () => {
+  const navigate = useNavigate();
+  const { start } = useQuizSession();
+
   return (
     <div className={styles.home}>
       <section className={styles.hero} aria-labelledby="home-title">
@@ -18,7 +24,11 @@ export const Home = () => {
             <li key={category.id}>
               <CategoryCard
                 category={category}
-                availability={homeContent.availability}
+                startLabel={homeContent.startLabel}
+                onStart={() => {
+                  start(category.id);
+                  void navigate(paths.quiz);
+                }}
               />
             </li>
           ))}

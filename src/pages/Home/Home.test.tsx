@@ -1,38 +1,69 @@
-import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vite-plus/test";
+import { act } from "react";
+import { createRoot, type Root } from "react-dom/client";
+import { MemoryRouter, Route, Routes } from "react-router";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+import { QuizSessionProvider } from "../../features/quiz-session/QuizSessionContext";
 import { Home } from "./Home";
 import { homeContent } from "./Home.content";
+import { Quiz } from "../Quiz/Quiz";
 
-const expectedCategories = [
-  [9, "General Knowledge"],
-  [12, "Music"],
-  [22, "Geography"],
-  [11, "Film"],
-  [21, "Sports"],
-  [18, "Computers"],
-];
+(
+  globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
+let root: Root | undefined;
+
+afterEach(() => {
+  act(() => root?.unmount());
+  root = undefined;
+  document.body.replaceChildren();
+});
 
 describe("Home", () => {
-  it("shows only the six v1 categories and their availability without fake actions", () => {
-    expect(homeContent.categories.map(({ id, name }) => [id, name])).toEqual(
-      expectedCategories,
-    );
-
-    const container = document.createElement("div");
-    container.innerHTML = renderToStaticMarkup(<Home />);
-    const titles = [...container.querySelectorAll("article h3")];
-
-    expect(container.querySelector("h1")?.textContent).toBe(homeContent.title);
-    expect(titles.map((title) => title.textContent)).toEqual(
-      expectedCategories.map(([, name]) => name),
-    );
-    expect(container.querySelectorAll("li")).toHaveLength(6);
-    expect(container.querySelectorAll("article p")).toHaveLength(6);
-    expect(
-      [...container.querySelectorAll("article p")].every(
-        (status) => status.textContent === homeContent.availability,
+  it("starts the selected category once and navigates to the loading view", async () => {
+    let finish!: (questions: never[]) => void;
+    const load = vi
+      .fn<
+        typeof import("../../features/quiz-data/opentdb").fetchQuizQuestions
+      >()
+      .mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          }),
+      );
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    root = createRoot(host);
+    await act(async () =>
+      root?.render(
+        <MemoryRouter>
+          <QuizSessionProvider load={load}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/quiz" element={<Quiz />} />
+            </Routes>
+          </QuizSessionProvider>
+        </MemoryRouter>,
       ),
-    ).toBe(true);
-    expect(container.querySelector("button, article a")).toBeNull();
+    );
+    expect(host.querySelectorAll("button")).toHaveLength(6);
+    expect(homeContent.categories).toHaveLength(6);
+    expect(
+      [...host.querySelectorAll("button")].map((button) =>
+        button.getAttribute("aria-label"),
+      ),
+    ).toEqual(
+      homeContent.categories.map(
+        (category) => `${homeContent.startLabel}: ${category.name}`,
+      ),
+    );
+    await act(async () => host.querySelectorAll("button")[1]?.click());
+    expect(load).toHaveBeenCalledOnce();
+    expect(load.mock.calls[0]?.[0]).toBe(12);
+    expect(host.textContent).toContain("Loading questions");
+    await act(async () => finish([]));
+    expect(host.textContent).toContain("Could not load questions");
+    await act(async () => host.querySelector("button")?.click());
+    expect(host.textContent).toContain(homeContent.title);
   });
 });
