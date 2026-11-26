@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { readTimerDuration } from "./timer-preference";
+import { readTimerDuration, type TimerDuration } from "./timer-preference";
 
 type Countdown = {
   questionKey: string | number | null;
@@ -16,6 +16,7 @@ type ActiveCountdown = {
 export function useQuestionCountdown(
   questionKey: string | number | null,
   onExpire: () => void,
+  duration?: TimerDuration,
 ): { remainingSeconds: number | null; expired: boolean; stop: () => boolean } {
   const [countdown, setCountdown] = useState<Countdown>({
     questionKey: null,
@@ -62,8 +63,8 @@ export function useQuestionCountdown(
       return;
     }
 
-    const duration = readTimerDuration();
-    const deadline = Date.now() + duration * 1000;
+    const seconds = duration ?? readTimerDuration();
+    const deadline = Date.now() + seconds * 1000;
     const tick = () => {
       const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
       if (remaining === 0) {
@@ -78,13 +79,13 @@ export function useQuestionCountdown(
     };
     const interval = setInterval(tick, 100);
     active.current = { deadline, interval };
-    setCountdown({ questionKey, remainingSeconds: duration, expired: false });
+    setCountdown({ questionKey, remainingSeconds: seconds, expired: false });
 
     return () => {
       clearInterval(interval);
       active.current = null;
     };
-  }, [questionKey, expire]);
+  }, [questionKey, duration, expire]);
 
   return {
     remainingSeconds:

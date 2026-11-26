@@ -21,16 +21,16 @@ let timer: Timer;
 let host: HTMLElement;
 const onExpire = vi.fn();
 
-function Probe({ id }: { id: string | null }) {
-  const value = useQuestionCountdown(id, onExpire);
+function Probe({ id, duration }: { id: string | null; duration?: 3 | 5 | 7 }) {
+  const value = useQuestionCountdown(id, onExpire, duration);
   useEffect(() => {
     timer = value;
   }, [value]);
   return null;
 }
 
-function render(questionKey: string | null): void {
-  act(() => root?.render(<Probe id={questionKey} />));
+function render(questionKey: string | null, duration?: 3 | 5 | 7): void {
+  act(() => root?.render(<Probe id={questionKey} duration={duration} />));
 }
 
 function advance(ms: number): void {
@@ -71,6 +71,17 @@ describe("useQuestionCountdown", () => {
     advance(2999);
     expect(timer.remainingSeconds).toBe(1);
     expect(onExpire).not.toHaveBeenCalled();
+  });
+
+  it("uses the round's captured duration despite a changed preference", () => {
+    localStorage.setItem(TIMER_STORAGE_KEY, "7");
+    render("first", 3);
+    expect(timer.remainingSeconds).toBe(3);
+    localStorage.setItem(TIMER_STORAGE_KEY, "5");
+    render("second", 3);
+    expect(timer.remainingSeconds).toBe(3);
+    advance(3000);
+    expect(onExpire).toHaveBeenCalledOnce();
   });
 
   it("stops on selection and never expires after stopping", () => {

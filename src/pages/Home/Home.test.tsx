@@ -63,7 +63,11 @@ describe("Home", () => {
     expect(host.textContent).toContain("Loading questions");
     await act(async () => finish([]));
     expect(host.textContent).toContain("Could not load questions");
-    await act(async () => host.querySelector("button")?.click());
+    await act(async () =>
+      [...host.querySelectorAll("button")]
+        .find((button) => button.textContent === "Back to Home")
+        ?.click(),
+    );
     expect(host.textContent).toContain(homeContent.title);
   });
 });
