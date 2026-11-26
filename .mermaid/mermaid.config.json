@@ -1,0 +1,15 @@
+{
+  "look": "classic",
+  "theme": "dark",
+  "themeVariables": {
+    "primaryColor": "#f0f4ff",
+    "primaryTextColor": "#1e1b4b",
+    "primaryBorderColor": "#4f46e5",
+    "lineColor": "#6366f1",
+    "fontSize": "16px"
+  },
+  "htmlLabels": false,
+  "class": {
+    "htmlLabels": false
+  }
+}

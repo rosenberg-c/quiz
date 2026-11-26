@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Render every .mmd under DOCS_DIR to sibling .generated.png and .generated.svg files.
+# Contract (env vars, all optional):
+#   DOCS_DIR      input directory (default: docs)
+#   MERMAID_IMAGE docker image (default: minlag/mermaid-cli:latest)
+#   MERMAID_BG    renderer background color (default: #222222)
+#   MERMAID_SCALE png scale factor (default: 4)
+#   MERMAID_CSS   css file passed to mmdc -C (default: .mermaid/mermaid.css)
+#   MERMAID_CONFIG config file passed to mmdc -c (default: .mermaid/mermaid.config.json)
+#   MERMAID_FORMAT output format: both, png, or svg (default: both)
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+DOCS_DIR="${DOCS_DIR:-docs}"
+IMAGE="${MERMAID_IMAGE:-minlag/mermaid-cli:latest}"
+BG="${MERMAID_BG:-#222222}"
+SCALE="${MERMAID_SCALE:-4}"
+CSS_FILE="${MERMAID_CSS:-.mermaid/mermaid.css}"
+CONFIG_FILE="${MERMAID_CONFIG:-.mermaid/mermaid.config.json}"
+FORMAT="${MERMAID_FORMAT:-both}"
+case "$FORMAT" in
+  both) formats=(png svg) ;;
+  png|svg) formats=("$FORMAT") ;;
+  *) echo "render: invalid MERMAID_FORMAT: $FORMAT (expected both, png, or svg)" >&2; exit 1 ;;
+esac
+
+cd "$ROOT"
+
+[ -d "$DOCS_DIR" ] || { echo "render: input dir not found: $DOCS_DIR" >&2; exit 1; }
+
+status=0
+count=0
+while IFS= read -r -d '' f; do
+  rel="${f#./}"
+  count=$((count + 1))
+  for ext in "${formats[@]}"; do
+    out="${rel%.mmd}.generated.$ext"
+    echo "render: $rel -> $out"
+    if ! docker run --rm \
+      -v "$ROOT:/work" -w /work \
+      "$IMAGE" \
+        -i "$rel" -o "$out" \
+        -b "$BG" \
+        -C "$CSS_FILE" -c "$CONFIG_FILE" \
+        --scale "$SCALE"; then
+      echo "render: FAILED $rel -> $out" >&2
+      status=1
+    fi
+  done
+done < <(find "$DOCS_DIR" -type f -name '*.mmd' -print0 | LC_ALL=C sort -z)
+
+if [ "$count" -eq 0 ]; then
+  echo "render: no .mmd files under $DOCS_DIR (nothing to do)" >&2
+fi
+exit "$status"
