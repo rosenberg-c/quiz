@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Quiz" />
+    <meta name="theme-color" content="#F7EFE3" />
+    <title>Quiz</title>
+    <script>
+      (function () {
+        var key = "quiz-theme-preference";
+        var preference = "system";
+        try {
+          var stored = localStorage.getItem(key);
+          if (stored === "system" || stored === "light" || stored === "dark") {
+            preference = stored;
+          }
+        } catch (e) {}
+        var systemDark = false;
+        try {
+          systemDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+        } catch (e) {}
+        var resolved =
+          preference === "system"
+            ? systemDark
+              ? "dark"
+              : "light"
+            : preference;
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.style.colorScheme = resolved;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) {
+          meta.setAttribute(
+            "content",
+            resolved === "dark" ? "#1b140f" : "#f7efe3",
+          );
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
