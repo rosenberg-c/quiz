@@ -1,10 +1,7 @@
 export const settingsContent = {
   title: "Settings",
   description:
-    "Timer settings are not available yet. Your choice is not saved.",
-  timerHeading: "The quiz timer will be mandatory. Planned choices (seconds)",
-  durations: [3, 5, 7, 10, 15, 20],
-  defaultDuration: 15,
+    "Choose how long you have to answer each quiz question. The timer is mandatory.",
+  timerHeading: "Time per question",
   durationUnit: "seconds",
-  defaultLabel: " (default)",
 } as const;
