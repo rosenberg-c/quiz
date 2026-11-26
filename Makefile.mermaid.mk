@@ -12,7 +12,7 @@ MERMAID_FORMAT ?= both
 .PHONY: mermaid-render mermaid-render-svg mermaid-render-png
 mermaid-render-svg: MERMAID_FORMAT = svg
 mermaid-render-png: MERMAID_FORMAT = png
-mermaid-render mermaid-render-svg mermaid-render-png:
+mermaid-render mermaid-render-svg mermaid-render-png: mermaid-clean
 	DOCS_DIR="$(DOCS_DIR)" \
 	MERMAID_IMAGE="$(MERMAID_IMAGE)" \
 	MERMAID_BG="$(MERMAID_BG)" \
